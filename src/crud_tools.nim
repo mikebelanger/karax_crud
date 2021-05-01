@@ -60,7 +60,7 @@ when defined(js):
                   option(value = option):
                     text option
 
-  proc dataList(selected: cstring, options: seq[string], name: cstring, id = (0..1000).rand, disabled = false): VNode =
+  proc dataList(selected: cstring, options: seq[string], name: cstring, id = (0..1000).rand, placeholder = "", disabled = false): VNode =
     let list_id = "list_" & $id
 
     if disabled:
@@ -68,7 +68,11 @@ when defined(js):
         input(list = list_id, disabled = $disabled, value = selected)
     else:
       result = buildHtml(tdiv):
-        input(list = list_id, value = selected)
+        if placeholder == "":
+          input(list = list_id, value = selected)
+        else:
+          input(list = list_id, value = selected, placeholder = placeholder)
+        
         datalist(id = list_id):
           for option in options:
             if option == selected:
@@ -206,5 +210,23 @@ when defined(js):
       of Input: buildHtml(input(type = "text", value = elem, placeholder = placeholder, id = $id))
       of TextArea: buildHtml(textarea(value = elem, placeholder = placeholder, id = $id))
 
-  proc create*(elem: enum, variant = Option, id = (0..100).rand): VNode =
-    let result = elem.update(variant = variant, id = id)
+  proc create*(elem: enum, placeholder: string, variant = Option, id = (0..100).rand): VNode =
+    let options = (elem.typeof.low..elem.typeof.high).mapIt($it)
+
+    result = case(variant):
+      of Option:
+        buildHtml(
+          optionsMenu(
+            name = $elem.typeof, 
+            message = placeholder, 
+            id = $id,
+            options = options,
+          ))
+      of DataList:
+        buildHtml(
+          dataList($elem, options, $elem.typeof, placeholder = placeholder, id = id)
+        )
+      of FieldSet:
+        buildHtml(
+          fieldSet($elem.typeof, options, $elem.typeof)
+        )

@@ -9,6 +9,11 @@ type
     Beef
     Vegetarian
 
+  IceCream = enum
+    Vanilla
+    Chocolate
+    Strawberry
+
 let 
   clothing = @["Shirt", "Socks", "Shoes"]
   food_special = Chicken
@@ -56,5 +61,6 @@ when defined(js):
         Beef.update(variant = DataList)
         Chicken.update(variant = FieldSet)
         Beef.read(variant = DataList)
+        Vanilla.create(variant = DataList, placeholder = "Enter your choice...")
 
   setRenderer render
