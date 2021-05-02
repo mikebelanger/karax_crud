@@ -2,6 +2,7 @@ import crud_tools
 import sequtils
 import times
 import karax / vstyles
+import colors
 
 type
   Food = enum
@@ -19,6 +20,8 @@ let
   food_special = Chicken
   some_range = 15..20
   a_time = now().utc
+  selection: seq[seq[string]] = @[(Food.low..Food.high).mapIt($it), (IceCream.low..IceCream.high).mapIt($it)]
+  color_choice = colDarkCyan
 
 when defined(js):
   include karax/prelude
@@ -29,6 +32,8 @@ when defined(js):
 
   var new_password = ""
   var password_feedback = ""
+
+  # echo "selection: ", selection
 
   proc render(): VNode =
     result = 
@@ -61,6 +66,7 @@ when defined(js):
         Beef.update(variant = DataList)
         Chicken.update(variant = FieldSet)
         Beef.read(variant = DataList)
-        Vanilla.create(variant = DataList, placeholder = "Enter your choice...")
+        Vanilla.create(variant = DataList, placeholder = "Enter your preferred ice cream flavour...")
+        color_choice.create
 
   setRenderer render

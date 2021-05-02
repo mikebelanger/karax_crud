@@ -1,6 +1,7 @@
 include karax/prelude
 import karax / [karaxdsl, kdom, vdom, vstyles]
 import sequtils, random, times
+import colors
 
 type
   TextVariant* = enum
@@ -71,7 +72,7 @@ when defined(js):
         if placeholder == "":
           input(list = list_id, value = selected)
         else:
-          input(list = list_id, value = selected, placeholder = placeholder)
+          input(list = list_id, placeholder = placeholder)
         
         datalist(id = list_id):
           for option in options:
@@ -146,6 +147,12 @@ when defined(js):
         options = elems
     ))
 
+  proc update*(elem: seq[seq[string]], variant = Option, id = (0..100).rand, disabled = false): VNode =
+    result = buildHtml(select(id = $id)):
+      for e in elem:
+        optgroup(label = "label"):
+          e.update
+
   proc update*[T: HSlice](x: T, default = 0, id = (0..100).rand): VNode =
     let range_seq = x.toSeq
     result = buildHtml(
@@ -163,6 +170,15 @@ when defined(js):
         `type` = "date",
         id = $id,
         value = dt.format(format)
+      )
+    )
+
+  proc update*(color: Color, id = (0..100).rand): VNode =
+    result = buildHtml(
+      input(
+        `type` = "color",
+        id = $id,
+        value = $color
       )
     )
 
@@ -230,3 +246,11 @@ when defined(js):
         buildHtml(
           fieldSet($elem.typeof, options, $elem.typeof)
         )
+
+  proc create*(color: Color): Vnode = 
+    color.update
+
+  func hidden*(hidden_value: int | string, name, id: cstring): VNode =
+    buildHtml(
+      input(`type` = "hidden", name = name, id = id, value = $hidden_value)
+    )
